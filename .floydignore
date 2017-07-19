@@ -11,3 +11,4 @@ sdist
 var
 /data
 /data.zip
+*.h5
