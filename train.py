@@ -1,6 +1,33 @@
 import csv
 from scipy.misc import imread
 import numpy as np
+import sklearn
+
+def generator(samples, batch_size=32):
+    num_samples = len(samples)
+    while 1: # Loop forever so the generator never terminates
+        for offset in range(0, num_samples, batch_size):
+            batch_samples = samples[offset:offset+batch_size]
+
+            images = []
+            measurements = []
+            for batch_sample in batch_samples:
+                source_path = batch_sample[0]
+                filepath = inputDir + source_path
+                image = imread(filepath)
+                measurement = float(batch_sample[3])
+                images.append(image)
+                measurements.append(measurement)
+                # Augment data : flipped image.
+                flip_image = np.fliplr(image)
+                flip_measurement = measurement * -1.0
+                images.append(flip_image)
+                measurements.append(flip_measurement)
+
+            # trim image to only see section with road
+            X_train = np.array(images)
+            y_train = np.array(measurements)
+            yield sklearn.utils.shuffle(X_train, y_train)
 
 inputDir = '/data/'
 outputDir = '/output/'
@@ -13,32 +40,7 @@ with open(inputDir + 'driving_log.csv') as csvfile:
     for line in reader:
         lines.append(line)
 
-images = []
-measurements = []
-
-for line in lines[1:]:
-    source_path = line[0]
-    filepath = inputDir + source_path
-    image = imread(filepath)
-    images.append(image)
-    measurement = float(line[3])
-    measurements.append(measurement)
-
-augmented_images = []
-augmented_measurements = []
-
 from scipy import ndimage
-
-for image, measurement in zip(images, measurements):
-    augmented_images.append(image)
-    augmented_measurements.append(measurement)
-    flip_image = np.fliplr(image)
-    augmented_images.append(flip_image)
-    augmented_measurements.append(measurement*-1.0)
-
-
-X_train = np.array(augmented_images)
-y_train = np.array(augmented_measurements)
 
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda
@@ -57,7 +59,17 @@ model.add(Dense(120))
 model.add(Dense(84))
 model.add(Dense(1))
 
+from sklearn.model_selection import train_test_split
+train_samples, validation_samples = train_test_split(lines[1:], test_size=0.2)
+
+train_generator = generator(train_samples, batch_size=32)
+validation_generator = generator(validation_samples, batch_size=32)
+
 model.compile(loss='mse', optimizer='adam')
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, epochs=5)
+model.fit_generator(train_generator,\
+            steps_per_epoch = len(train_samples)/32,\
+            validation_data = validation_generator,\
+            validation_steps = len(validation_samples)/32,\
+            epochs=5)
 
 model.save(outputDir+'model.h5')
