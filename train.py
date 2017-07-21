@@ -15,7 +15,7 @@ def train(inputCSVFile, inputDir, inputModel, outputDir):
     from scipy import ndimage
 
     from keras.models import Sequential, load_model
-    from keras.layers import Flatten, Dense, Lambda
+    from keras.layers import Flatten, Dense, Lambda, Dropout
     from keras.layers.convolutional import Conv2D, Cropping2D
     from keras.layers.pooling import MaxPooling2D
 
@@ -29,7 +29,9 @@ def train(inputCSVFile, inputDir, inputModel, outputDir):
         model.add(MaxPooling2D())
         model.add(Flatten())
         model.add(Dense(120))
+        model.add(Dropout(0.5))
         model.add(Dense(84))
+        model.add(Dropout(0.5))
         model.add(Dense(1))
         model.compile(loss='mse', optimizer='adam')
     else:
