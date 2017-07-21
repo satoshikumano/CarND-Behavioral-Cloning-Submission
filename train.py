@@ -48,12 +48,19 @@ def train(inputCSVFile, inputDir, inputModel, outputDir):
                 validation_steps = len(validation_samples)/32,\
                 epochs=5)
 
-    # Save data
-    import pickle
-    outfilep = open(outputDir+'history.pkl', 'wb')
-    pickle.dump(history, outfilep)
-    outfilep.close()
+    # Save model
     model.save(outputDir + 'model.h5')
+    # Save hisotry as graph
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('model mean squared error loss')
+    plt.ylabel('mean squared error loss')
+    plt.xlabel('epoch')
+    plt.legend(['training set', 'validation set'], loc='upper right')
+    plt.savefig(outputDir+'history.png')
 
 def main(argv):
     helpmsg = 'train.py -i <inputCSV> -m <inputModel> -d <imageDir> -o <outputDir>'
