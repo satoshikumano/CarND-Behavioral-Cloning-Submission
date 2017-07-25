@@ -33,7 +33,7 @@ The goals / steps of this project are the following:
 
 #### Recorded video
 
-[video](./vidoes/nvidia-center.mp4)
+[video](./videos/nvidia-center.mp4)
 
 #### Code
 * [model.py](./model.py) containing the script to create and train the model.
