@@ -210,3 +210,7 @@ Ex.)
 * If there are obstacles on the road and car is forced to approach to the corner.
   -> Model trained with left/ right images and augmented steering angle
   would get better result.
+  
+  In fact, model trained with left/ right images performs much better than
+  submitted model on course 2.
+  However, is not enough to go around the course 2.
