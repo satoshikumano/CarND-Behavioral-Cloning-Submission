@@ -198,3 +198,15 @@ The car go around the course 1.
 Bit weaving comparing to the result not using left/ right images.
 
 [Driving video](./videos/nvidia-lr.mp4)
+
+### Conclusion
+
+The best result was obtained by Nvidia pipeline and using center camera images
+only.
+
+This result might be changed depending on the condition.
+
+Ex.)
+* If there are obstacles on the road and car is forced to approach to the corner.
+  -> Model trained with left/ right images and augmented steering angle
+  would get better result.
